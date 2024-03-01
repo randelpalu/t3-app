@@ -1,7 +1,39 @@
-import { UserButton, currentUser } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs";
 import { unstable_noStore as noStore } from "next/cache";
-
+import { SignInButton } from "@clerk/nextjs";
 import { api } from "~/trpc/server";
+import { CreatePost } from "./_components/create-post";
+import { type RouterOutputs } from "../trpc/shared";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime"
+import Image from "next/image";
+
+dayjs.extend(relativeTime);
+
+type PostWithUser = RouterOutputs["post"]["getAll"][number];
+
+const PostView = (props: PostWithUser) => {
+  const { post, author } = props;
+
+  return (
+    <div key={post.id} className="flex gap-3 border-b border-slate-400 p-8">
+      <Image
+        alt={`${author.username}'s profile picture`}
+        className="w-16 h-16 rounded-full"
+        src={author.imageUrl}
+        width={56}
+        height={56}>
+      </Image>
+      <div className="flex flex-col">
+        <div className="flex text-slate-300">
+          <span>{`@${author.username}`}</span>
+          <span className="font-thin">{`\u00A0\u00A0∙  ${dayjs(post.createdAt).fromNow()}`}</span>
+        </div>
+        <span>{post.content}</span>
+      </div>
+    </div>
+  )
+}
 
 export default async function Home() {
   noStore();
@@ -10,22 +42,21 @@ export default async function Home() {
   const posts = await api.post.getAll.query();
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-      <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-2xl text-white">
+    <main className="flex h-screen justify-center">
+      <div className="h-full w-full border-x border-slate-400 md:max-w-2xl">
+        <div className="flex border-b border-slate-400 p-4">
+          { !!user ? <CreatePost /> : <SignInButton />}
+        </div>
+        <div className="flex justify-center border-b border-slate-400 p-4">
+          <p>
             {hello ? hello.greeting : "Loading tRPC query..."}
           </p>
         </div>
         <div>
-          { !!user ? user.firstName : '( Not logged in )'}
         </div>
-        <div>
-          <UserButton />
-        </div>
-        <div>
-          { posts?.map((post) => (
-            <div key={post.id}>{post.content}</div>
+        <div className="flex flex-col">
+          { posts?.map((fullPost) => (
+            <PostView {...fullPost} key={fullPost.post.id}/>
           ))}
         </div>
       </div>
