@@ -50,7 +50,7 @@ export const postRouter = createTRPCRouter({
 
   getAll: publicProcedure.query(async ({ ctx }) => {
     // simulate a slow db call
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     const posts = await ctx.db.post.findMany({
       take: 100

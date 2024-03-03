@@ -7,6 +7,8 @@ import { type RouterOutputs } from "../trpc/shared";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime"
 import Image from "next/image";
+import { Suspense } from "react";
+import { loaderWithTopMargin } from "./loading";
 
 dayjs.extend(relativeTime);
 
@@ -35,14 +37,25 @@ const PostView = (props: PostWithUser) => {
   )
 }
 
+const Feed = async() => {
+  const posts = await api.post.getAll.query();
+
+  return (
+    <div className="flex flex-col">
+      { posts?.map((fullPost) => (
+        <PostView {...fullPost} key={fullPost.post.id}/>
+      ))}
+    </div>
+  )
+}
+
 export default async function Home() {
   noStore();
   const hello = await api.post.hello.query({ text: "from tRPC" });
   const user = await currentUser();
-  const posts = await api.post.getAll.query();
 
   return (
-    <main className="flex h-screen justify-center">
+    <main className="flex h-screen w-screen justify-center">
       <div className="h-full w-full border-x border-slate-400 md:max-w-2xl">
         <div className="flex border-b border-slate-400 p-4">
           { !!user ? <CreatePost /> : <SignInButton />}
@@ -54,11 +67,9 @@ export default async function Home() {
         </div>
         <div>
         </div>
-        <div className="flex flex-col">
-          { posts?.map((fullPost) => (
-            <PostView {...fullPost} key={fullPost.post.id}/>
-          ))}
-        </div>
+        <Suspense fallback={ loaderWithTopMargin(60) }>
+          <Feed />
+        </Suspense>
       </div>
     </main>
   );
