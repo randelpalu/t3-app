@@ -12,28 +12,17 @@ export function CreatePost() {
   const [content, setContent] = useState("");
   const { user } = useUser();
 
-  if (!user) {
-    return null;
-  }
-
-  return (
-    <div className="flex gap-3 w-full outline-none">
-      <Image
-        className="w-16 h-16 rounded-full"
-        alt="Profile image"
-        src={user.imageUrl}
-        width={56}
-        height={56}>
-      </Image>
-      <input placeholder="Type some emojis!" className="grow bg-transparent"></input>
-    </div>
-  )
+  if (!user) return null;
 
   const createPost = api.post.create.useMutation({
     onSuccess: () => {
       router.refresh();
       setContent("");
     },
+    onError: (error) => {
+      router.refresh();
+      setContent("");
+    }
   });
 
   return (
@@ -42,11 +31,18 @@ export function CreatePost() {
         e.preventDefault();
         createPost.mutate({ content });
       }}
-      className="flex flex-col gap-2"
+      className="flex gap-3 w-full outline-none"
     >
+      <Image
+        className="w-16 h-16 rounded-full"
+        alt="Profile image"
+        src={user.imageUrl}
+        width={56}
+        height={56}>
+      </Image>
       <input
         type="text"
-        placeholder="Title"
+        placeholder="Type some emojis !"
         value={content}
         onChange={(e) => setContent(e.target.value)}
         className="w-full rounded-full px-4 py-2 text-black"
