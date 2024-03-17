@@ -4,4 +4,6 @@
 
 body {
   @apply min-h-screen bg-black text-slate-100;
+
+  overscroll-behavior: none;
 }
