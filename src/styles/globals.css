@@ -3,5 +3,5 @@
 @tailwind utilities;
 
 body {
-  @apply flex justify-center items-center min-h-screen bg-black text-slate-100;
+  @apply min-h-screen bg-black text-slate-100;
 }

@@ -9,6 +9,7 @@ import relativeTime from "dayjs/plugin/relativeTime"
 import Image from "next/image";
 import { Suspense } from "react";
 import { loaderWithTopMargin } from "./loading";
+import Link from "next/link";
 
 dayjs.extend(relativeTime);
 
@@ -28,8 +29,12 @@ const PostView = (props: PostWithUser) => {
       </Image>
       <div className="flex flex-col">
         <div className="flex text-slate-300">
-          <span>{`@${author.username}`}</span>
-          <span className="font-thin">{`\u00A0\u00A0∙  ${dayjs(post.createdAt).fromNow()}`}</span>
+          <Link href={`/user/${author.id}`}>
+            <span>{`@${author.username}`}</span>
+          </Link>
+          <Link href={`/post/${post.id}`}>
+            <span className="font-thin">{`\u00A0\u00A0∙  ${dayjs(post.createdAt).fromNow()}`}</span>
+          </Link>
         </div>
         <span>{post.content}</span>
       </div>
@@ -53,6 +58,11 @@ export default async function Home() {
   noStore();
   const hello = await api.post.hello.query({ text: "from tRPC" });
   const user = await currentUser();
+  // await new Promise((resolve) => {
+  //   setTimeout((
+  //     resolve
+  //   ), 10000)
+  // })
 
   return (
     <main className="flex h-screen w-screen justify-center">
@@ -64,8 +74,6 @@ export default async function Home() {
           <p>
             {hello ? hello.greeting : "Loading tRPC query..."}
           </p>
-        </div>
-        <div>
         </div>
         <Suspense fallback={ loaderWithTopMargin(60) }>
           <Feed />

@@ -58,7 +58,7 @@ export function CreatePost() {
           className="w-4/6 h-full rounded-full px-4 py-2 text-black"
         />
         <div>
-          {content !== 'd' && !createPost.isLoading && (
+          {content !== '' && !createPost.isLoading && (
             <button
             type="submit"
             className="rounded-full w-36 h-full bg-orange-600 px-10 py-3 font-semibold transition hover:bg-orange-600/90"
